@@ -1,180 +1,114 @@
-# 🎫 Campus-Event
+# 🛡️ Le Bouclier de Production — Campus-Event CI/CD
 
-![Status](https://img.shields.io/badge/status-en%20développement-yellow)
-![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-green)
-![MySQL](https://img.shields.io/badge/mysql-8.0-blue)
-
-Plateforme de billetterie universitaire permettant aux associations étudiantes de créer des événements et aux étudiants de réserver leurs tickets en ligne avec génération automatique de QR Code.
-
-
-## Description & Contexte
-
-Campus-Event est une application web full-stack développée dans le cadre d'un projet universitaire. Elle permet à 3 types d'utilisateurs d'interagir :
-
-- 🎓 **L'étudiant** consulte les événements, réserve des tickets et reçoit un QR Code scannable.
-- 🏛 **Le responsable d'association** crée et gère ses événements depuis un dashboard dédié.
-- ⚙️ **L'administrateur** supervise l'ensemble de la plateforme.
-
-Le projet suit une méthodologie **Usine Logicielle** avec une toolchain intégrée : Notion (documentation), Trello (Kanban), GitHub (versioning) et Slack (alertes automatiques).
+Pipeline d'Intégration Continue pour protéger la branche `main` contre tout code défectueux.
 
 ---
 
-## Prérequis & Installation
+## 📁 Structure du projet
 
-### Prérequis
+```
+campus-event/
+├── .github/
+│   └── workflows/
+│       └── ci.yml             ← Pipeline GitHub Actions
+├── campus_event.py            ← Code source principal
+├── test_campus_event.py       ← Tests unitaires (pytest)
+├── README.md
+└── .flake8                    ← (optionnel) config du linter
+```
 
-- Node.js >= 18.0.0
-- MySQL 8.0
-- npm >= 9.0.0
-- Git
+---
 
-### Installation
+## ⚙️ Installation locale
 
-**Étape 1 — Cloner le dépôt**
 ```bash
-git clone https://github.com/Mwin-Tour/campus-event.git
+# 1. Cloner le dépôt
+git clone https://github.com/<votre-org>/campus-event.git
 cd campus-event
-```
 
-**Étape 2 — Installer les dépendances backend**
-```bash
-cd backend
-npm install
-```
+# 2. Installer les dépendances
+pip install flake8 pytest
 
-**Étape 3 — Configurer les variables d'environnement**
-```bash
-cp .env.example .env
-```
-Édite le fichier `.env` avec tes valeurs :
-```env
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=root
-DB_PASS=ton_mot_de_passe
-DB_NAME=campus_event
-JWT_SECRET=un_secret_tres_long_et_securise
-PORT=3000
-```
+# 3. Lancer le linter manuellement
+flake8 . --max-line-length=127
 
-**Étape 4 — Créer la base de données**
-```bash
-mysql -u root -p < docs/campus_event_database.sql
-```
-
-**Étape 5 — Démarrer le serveur**
-```bash
-npm start
-```
-Le serveur tourne sur → http://localhost:3000
-
-**Étape 6 — Ouvrir l'interface**
-
-Ouvre simplement `frontend/index.html` dans ton navigateur.
-
----
-
-## Utilisation & Exemples
-
-### Inscription d'un étudiant
-```bash
-curl -X POST http://localhost:3000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "nom": "Diallo",
-    "prenom": "Ousmane",
-    "email": "ousmane@campus.edu",
-    "mot_de_passe": "monMotDePasse123"
-  }'
-```
-
-### Connexion et récupération du token JWT
-```bash
-curl -X POST http://localhost:3000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email": "ousmane@campus.edu", "mot_de_passe": "monMotDePasse123"}'
-```
-
-### Liste des événements disponibles
-```bash
-curl http://localhost:3000/api/events
-```
-
-### Réserver un ticket (avec token JWT)
-```bash
-curl -X POST http://localhost:3000/api/reservations \
-  -H "Authorization: Bearer TON_TOKEN_JWT" \
-  -H "Content-Type: application/json" \
-  -d '{"evenement_id": 1, "nombre_tickets": 2}'
-```
-
-### Vérifier que l'API fonctionne
-```bash
-curl http://localhost:3000/api/health
-# Réponse attendue : {"status": "ok"}
+# 4. Lancer les tests manuellement
+pytest test_campus_event.py -v
 ```
 
 ---
 
-## Guide de Contribution
+## 🚀 Mise en place du pipeline (étapes GitHub)
 
-### Convention de branches
-```
-feature/nom-fonctionnalite   → nouvelle fonctionnalité
-hotfix/nom-correction        → correctif urgent
-```
-
-### Convention de commits
-```
-feat: description [Trello-Card-#N]      → nouvelle fonctionnalité
-fix: description [Trello-Card-#N]       → correction de bug
-docs: description [Trello-Card-#N]      → documentation
-hotfix: description [Trello-Card-#N]    → correctif urgent
+### Étape 1 — Pousser les fichiers sur GitHub
+```bash
+git add .
+git commit -m "feat: ajout du pipeline CI Le Bouclier de Production"
+git push origin main
 ```
 
-### Processus de Pull Request
-1. Crée ta branche depuis `develop`
-2. Développe et commit avec la convention ci-dessus
-3. Pousse ta branche : `git push origin feature/ma-branche`
-4. Ouvre une Pull Request vers `develop`
-5. Au moins **1 membre** doit approuver avant le merge
-6. Après merge → déplace le ticket Trello vers **✅ Terminé**
+### Étape 2 — Activer la protection de branche
 
-Voir [CONTRIBUTING.md](./CONTRIBUTING.md) pour plus de détails.
+1. Aller dans **Settings → Branches** de votre dépôt GitHub
+2. Cliquer sur **Add branch protection rule**
+3. Renseigner `main` dans *Branch name pattern*
+4. Cocher ✅ **Require status checks to pass before merging**
+5. Dans la barre de recherche, taper `Vérification & Tests` (le nom du job CI)
+6. Cocher ✅ **Require branches to be up to date before merging**
+7. Cliquer **Save changes**
+
+> ⚠️ Le job doit avoir tourné **au moins une fois** avant d'apparaître dans la liste.
 
 ---
 
-## 📄 Licence
+## 🎬 Scénarios de démonstration
 
-**Licence Propriétaire — Campus-Event**
+### ❌ Démo d'échec — Code cassé
 
-Copyright (c) 2026 Équipe Campus-Event. Tous droits réservés.
+Créer une branche et introduire une erreur de syntaxe :
 
-Ce logiciel et sa documentation associée sont la propriété exclusive de l’équipe Campus-Event.
+```bash
+git checkout -b feature/test-echec
+# Editer campus_event.py : supprimer un ":" à la fin d'un def
+# Exemple : "def calculer_prix_panier(articles)" ← syntaxe invalide
+git add campus_event.py
+git commit -m "test: code cassé intentionnellement"
+git push origin feature/test-echec
+```
 
-### 🚫 Restrictions
-- Il est strictement interdit de copier, modifier, distribuer, vendre ou exploiter tout ou partie de ce logiciel sans autorisation écrite préalable.
-- Toute reproduction ou utilisation non autorisée constitue une violation des droits d’auteur.
-
-### 🔐 Utilisation autorisée
-- Ce projet est fourni uniquement dans un cadre académique et de démonstration.
-- Aucun droit d’exploitation commerciale n’est accordé.
-
-### ⚖️ Responsabilité
-- Le logiciel est fourni “en l’état”, sans garantie d’aucune sorte.
-- Les auteurs ne peuvent être tenus responsables des dommages résultant de son utilisation.
-
-### 📩 Contact
-Pour toute demande d’autorisation ou d’utilisation :
-> contacter l’équipe Campus-Event
+→ Ouvrir une Pull Request vers `main`  
+→ Le robot détecte l'erreur → ❌ croix rouge → bouton **Merge bloqué**
 
 ---
 
-## Liens utiles
+### ✅ Démo de succès — Code corrigé
 
-| Outil | Lien |
-|-------|------|
-| 📋 Notion (Wiki) | [https://www.notion.so/Campus-event-central-33545519435880e1bdf2c71215d908d7?source=copy_link] |
-| 📌 Trello (Kanban) | [https://trello.com/invite/b/69cbadee10695d790b571fff/ATTI7676f517614835fef831017af9b4a8b2EE2B126F/campus-events] |
-| 💬 Slack | [https://app.slack.com/client/T0AQLJBTH6V/C0APS927WK1] |
-| 📂 GitHub | [https://github.com/Mwin-Tour/campus-event] |
+```bash
+# Corriger l'erreur dans campus_event.py
+git add campus_event.py
+git commit -m "fix: correction de la syntaxe"
+git push origin feature/test-echec
+```
+
+→ Le robot relance automatiquement → ✅ coche verte → bouton **Merge débloqué**
+
+---
+
+## 🔧 Ce que fait le robot (détail du pipeline)
+
+| Étape | Outil | Rôle |
+|---|---|---|
+| Checkout | `actions/checkout` | Télécharge le code de la PR |
+| Python setup | `actions/setup-python` | Configure Python 3.11 |
+| Installation | `pip install` | Installe flake8 et pytest |
+| Linter | `flake8` | Vérifie la syntaxe et le style |
+| Tests | `pytest` | Exécute tous les tests unitaires |
+
+---
+
+## 📚 Ressources utiles
+
+- [Documentation GitHub Actions](https://docs.github.com/en/actions)
+- [pytest — Introduction](https://docs.pytest.org/en/stable/getting-started.html)
+- [flake8 — Documentation](https://flake8.pycqa.org/en/latest/)
+- [Branch protection rules](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches)
