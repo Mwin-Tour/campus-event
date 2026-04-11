@@ -1,5 +1,4 @@
 # Version 1.0
-
 def calculer_prix_panier(articles):
     """Calcule le prix total d'un panier d'articles.
 
