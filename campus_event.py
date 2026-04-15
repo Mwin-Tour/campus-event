@@ -8,4 +8,4 @@ def calculer_prix_panier(articles):
     total = 0.0
     for article in articles:
         total += article["prix"] * article["quantite"]
-    return round(total, 2)
+    return round(total, 2
